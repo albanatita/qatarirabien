@@ -1,0 +1,74 @@
+version:  '3.8'
+
+services:
+  web:
+    build: 
+      context: ./messageServer
+      dockerfile: Dockerfile.prod
+    env_file:
+      - ./messageServer/project/.env
+    command: bash -c 'gunicorn --bind 0.0.0.0:5000 manage:app'
+    links: 
+      - db:db
+    ports:
+      - 5000:5000
+    expose:  # new
+      - 5000
+    environment:
+      - FLASK_APP=project/messenger.py
+    depends_on:
+      - db
+      - redis
+    networks:
+      - traefik_web
+      - lan
+    labels:  # new
+      - traefik.enable=true
+      - traefik.http.routers.https-web.entryPoints=websecure
+      - traefik.http.routers.https-web.tls.certresolver=leresolver
+      - traefik.http.routers.https-web.rule=Host(`alkemata.com`)
+      - traefik.http.routers.https-web.tls=true
+      - traefik.http.routers.https-web.service=web
+      - traefik.http.services.web.loadbalancer.server.port=5000
+
+  db:
+    build: ./postgresql
+    volumes:
+      - db:/var/lib/postgresql/data/
+    env_file: 
+      - ./messageServer/project/.env
+    ports:
+      - 5432:5432
+
+  redis:
+    image: redis:6.2-alpine
+    restart: always
+    ports:
+      - 6379:6379
+    command: redis-server --loglevel warning
+    volumes: 
+      - cache:/data
+    networks:
+      - lan
+
+  twitterbot:
+    build: 
+      context: ./TwitterBot
+      dockerfile: Dockerfile.prod
+    command: bash -c 'python twitterbot.py'
+    env_file:
+      - ./TwitterBot/.env
+    depends_on:
+      - web
+    networks:
+      - lan
+
+volumes:
+  db:
+  cache:
+
+networks:
+  traefik_web:
+    external: true
+  lan:
+    driver: bridge

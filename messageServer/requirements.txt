@@ -1,0 +1,9 @@
+Flask
+flask-sse
+gevent
+gunicorn
+requests
+flask-sqlalchemy
+psycopg2-binary
+python-dotenv
+apscheduler

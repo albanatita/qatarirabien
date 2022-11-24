@@ -1,0 +1,7 @@
+install:
+set values in .venv
+docker-compose build
+docker-compose up
+
+create tables in the database:
+docker-compose exec web python manage.py create_db

@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Qatarira bien</title>
+</head>
+<body>
+  <h1>On regarde si cela peut marcher</h1>
+  Liste des derniers messages:
+  <ul id="list">
+
+  </ul>
+  <script>
+    var source = new EventSource('{{sse_url}}');
+    source.addEventListener('goal_fr', function(event) {
+        var data = JSON.parse(event.data);
+        const newElement = document.createElement("li");
+        const eventList = document.getElementById("list");
+        newElement.textContent = data.message;
+        eventList.appendChild(newElement);
+    }, false);
+    source.addEventListener('error', function(event) {
+        alert("Failed to connect to event stream. Is Redis running?");
+    }, false);
+  </script>
+</body>
+</html>

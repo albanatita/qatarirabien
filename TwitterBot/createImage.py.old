@@ -1,0 +1,37 @@
+from cairosvg import svg2png
+
+#test cairosvg
+def createImage(number):
+    svgtemplate="""<svg width="400" height="400" viewBox="0 0 105.83333 105.83334" version="1.1" id="svg8">
+    <text
+            xml:space="preserve"
+        id="text18"
+        style="font-style:normal;font-weight:normal;font-size:10.5833px;line-height:1.25;font-family:sans-serif;white-space:pre;shape-inside:url(#rect20);fill:#000000;fill-opacity:1;stroke:none;"
+        transform="translate(22.678572,-5.2916668)"><tspan
+            x="12.851562"
+            y="38.758981"><tspan>BUT!!!</tspan></tspan></text>
+        <text
+        xml:space="preserve"
+        id="text24"
+        style="font-style:normal;font-weight:normal;font-size:10.5833px;line-height:1.25;font-family:sans-serif;white-space:pre;shape-inside:url(#rect26);fill:#000000;fill-opacity:1;stroke:none;"><tspan
+            x="15.119141"
+            y="62.194528"><tspan>{number} pingouins </tspan></tspan><tspan
+            x="15.119141"
+            y="75.423654"><tspan>sont la!</tspan></tspan></text>
+        <ellipse
+        style="fill:#ff0000;fill-rule:evenodd;stroke-width:0.264583"
+        id="path30"
+        cx="16.819941"
+        cy="15.308036"
+        rx="9.260417"
+        ry="8.5044641" />
+    </svg>
+    """
+
+    svgtext=svgtemplate.format(number=number)
+
+    svg2png(bytestring=svgtext,write_to='output.png')
+    return
+
+if __name__ == '__main__':
+   createImage(10)

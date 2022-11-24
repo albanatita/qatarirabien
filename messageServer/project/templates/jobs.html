@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Qatarira bien</title>
+</head>
+<body>
+  <h1>Liste des taches en cours</h1>
+  <table>
+    {% for date_job, hashtag, home_name, away_name, date in my_list %}
+    <tr>
+        <td>{{ date_job }}</td>
+        <td>{{hashtag}}</td>
+        <td>{{ home_name }}</td>
+        <td>{{ away_name }}</td>
+        <td>{{ date }}</td>
+    </tr>
+{% endfor %}
+    </table>
+  </body>
+</html>

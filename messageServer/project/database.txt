@@ -1,0 +1,28 @@
+sudo docker pull postgres:latest
+
+sudo docker volume create postgres-volume
+
+sudo docker run -d --name=postgres13 -p 5432:5432 -v postgres-volume:/var/lib/postgresql/data -e POSTGRES_PASSWORD=xxxxx postgres
+sudo docker logs postgres13
+
+sudo docker exec -it postgres13 psql -U postgres
+\dt : display tables
+\c messages
+flask --app messenger.py shell
+db.create_all()
+TABLE matches_events;
+delete from matches_events;
+
+
+CREATE DATABASE messages;
+
+docker run --name=redis-devel --publish=6379:6379 --hostname=redis --restart=on-failure --detach redis:latest
+
+python manage.py db init
+
+source setcredentials.sh
+
+python3 db_manage.py
+
+docker-compose -f docker-compose.dev.yml exec db bash
+psql messages -U postgres

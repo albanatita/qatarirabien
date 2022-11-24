@@ -1,0 +1,81 @@
+version:  '3'
+
+services:
+  web:
+    build: 
+      context: ./messageServer
+      dockerfile: Dockerfile.dev
+    volumes:
+      - ./:/app
+    env_file:
+      - ./messageServer/project/.env
+    command: bash -c 'while !</dev/tcp/db/5432; do sleep 1; done; cd messageServer/project; flask --app messenger run --host=0.0.0.0 '
+    links: 
+      - db:db
+    ports:
+      - 5000:5000
+    environment:
+      - FLASK_APP=project/messenger.py
+    depends_on:
+      - db
+      - redis
+    networks:
+      - traefik_web
+      - lan
+    expose:
+      - 5000
+    labels:  # new
+      - traefik.enable=true
+      - traefik.http.routers.https-web.entryPoints=websecure
+      - traefik.http.routers.https-web.tls.certresolver=leresolver
+      - traefik.http.routers.https-web.rule=Host(`qataredcard.eu`)
+      - traefik.http.routers.https-web.tls=true
+      - traefik.http.routers.https-web.service=web
+      - traefik.http.services.web.loadbalancer.server.port=5000
+      - traefik.docker.network=traefik_web
+
+  db:
+    build: ./postgresql
+    volumes:
+      - db:/var/lib/postgresql/data/
+    env_file: 
+      - ./messageServer/project/.env
+    ports:
+      - 5432:5432
+    networks:
+      - lan
+
+  redis:
+    image: redis:6.2-alpine
+    restart: always
+    ports:
+      - 6379:6379
+    command: redis-server --loglevel warning
+    volumes: 
+      - cache:/data
+    networks:
+      - lan
+
+  twitterbot:
+    build: 
+      context: ./TwitterBot
+      dockerfile: Dockerfile.dev
+    command: bash -c 'while !</dev/tcp/web/5000; do sleep 1; done; python twitterbot.py'
+    env_file:
+      - ./TwitterBot/.env
+    volumes:
+      - ./TwitterBot:/app    
+    depends_on:
+      - web
+    networks:
+      - lan
+
+volumes:
+  db:
+  cache:
+
+networks:
+  traefik_web:
+    external: true
+  lan:
+    driver: bridge
