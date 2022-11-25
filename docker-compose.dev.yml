@@ -60,9 +60,10 @@ services:
     build: 
       context: ./TwitterBot
       dockerfile: Dockerfile.dev
-    command: bash -c 'while !</dev/tcp/web/5000; do sleep 1; done; python twitterbot.py'
+#    command: bash -c 'while !</dev/tcp/web/5000; do sleep 1; done; python twitterbot.py'
+    command: bash -c 'python twitterbot.py'
     env_file:
-      - ./TwitterBot/.env
+      - ./TwitterBot/.env.en
     volumes:
       - ./TwitterBot:/app    
     depends_on:

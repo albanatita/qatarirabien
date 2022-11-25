@@ -5,11 +5,10 @@ import os
 import requests
 import time
 import sys
+import random
 import pickle
 from dotenv import load_dotenv
 
-language = 'fr'
-print("=====> starting twitter bot")
 
 
 def get_env_variable(name):
@@ -20,47 +19,42 @@ def get_env_variable(name):
         raise Exception(message)
 
 
-load_dotenv()
+#load_dotenv()
 # Variables that contains the credentials to access Twitter API
 ACCESS_TOKEN = get_env_variable("TWITTER_ACCESS_TOKEN")
 ACCESS_SECRET = get_env_variable("TWITTER_ACCESS_SECRET")
 CONSUMER_KEY = get_env_variable("TWITTER_CONSUMER_KEY")
 CONSUMER_SECRET = get_env_variable("TWITTER_CONSUMER_SECRET")
 BEARER_TOKEN = get_env_variable("TWITTER_BEARER_TOKEN")
+LANGUAGE = get_env_variable("LANGUAGE")
+API_VERSION = get_env_variable("API_VERSION")
 
+print("=====> starting twitter bot - Language : " + LANGUAGE)
 
-auth = tweepy.OAuthHandler(
+if API_VERSION == "1":
+    auth = tweepy.OAuthHandler(
             CONSUMER_KEY,
             CONSUMER_SECRET
             )
-auth.set_access_token(
+    auth.set_access_token(
             ACCESS_TOKEN,
             ACCESS_SECRET
             )
-api = tweepy.API(auth)
-# Setup access to API
+    api = tweepy.API(auth)
+else:
+    client2=tweepy.Client(BEARER_TOKEN,consumer_key=CONSUMER_KEY,consumer_secret=CONSUMER_SECRET,
+                access_token=ACCESS_TOKEN, access_token_secret=ACCESS_SECRET,
+                return_type = requests.Response,
+                         wait_on_rate_limit=True)
 
-# auth = tweepy.AppAuthHandler('2Z5z8ZYKMwE0OHJqSapLEvPHg','fcsYoZXN5Q8NSAu7u5KlYr5P4EOdAFcVQOLldFzOGBpeGFvUNO')
-# client2 = tweepy.Client("AAAAAAAAAAAAAAAAAAAAAEcojgEAAAAA1kEatB2HeU2o4R0ifcEaO7EoFn0%3DQVXvU3tOI736uP1NXf2TneM7og7w6Fl7pKJSbDES2q85cUsvVw",
-#                         consumer_key='eGitM8YBVPn4l2j4AoUfEvHHW', 
-#                         consumer_secret='STiLyYzpl5m0wQOzvmZTSo7fIYUlW2lJRhwpTzpOmywWQRBKEG', 
-#                        access_token='1593363088073424896-IJSVdFoHKPOjusKP2DjqPEutoDkdCh', 
-#                        access_token_secret='dQL85vYMlBgVfzBSjx9CnSZhpoAJHSQIdGYy9nG0MHVJB',
-#                        return_type = requests.Response,
-#                         wait_on_rate_limit=True)
-
-# tweet = client2.get_tweet(id='1594319140562808835',expansions=['attachments.media_keys']).json()
-# print(tweet)
-# media1='1594319138545360897'
-# client2.create_tweet(text='test camera...',media_ids=[media1])
-
-# sys.exit()
-with open("./data/tweets.csv", "r") as filestream:
+with open("./data/tweets_" + LANGUAGE + ".csv", "r") as filestream:
     list_tweets = dict()
     for line in filestream:
         currentline = line.split(";")
-        list_tweets[currentline[0]] = {
-            "message": currentline[1], "picture": currentline[2]}
+        if currentline[0] not in list_tweets:
+            list_tweets[currentline[0]]=[{"message": currentline[1], "picture": currentline[2]}]
+        else:
+            list_tweets[currentline[0]].append({"message": currentline[1], "picture": currentline[2]})
 
 translations = pickle.load( open( "./data/translation.p", "rb" ) )
 
@@ -86,13 +80,17 @@ for event in client:
     death_cumulated = int(result["cumulated_time"] * 1.13)
 
     match_title = match['home_name'] + ' - ' + match['away_name']
-    message = ""
+    nonformmsg = ""
     hashtag = "#"+translations[match['home_name']]['hashtag']+translations[match['away_name']]['hashtag']
-    dict = {"team_1": translations[match['home_name']]['translation']['fr'], "team_2": translations[match['away_name']]['translation']['fr'],
+    dict = {"team_1": translations[match['home_name']]['translation'][LANGUAGE], "team_2": translations[match['away_name']]['translation'][LANGUAGE],
              "hashtag": hashtag,
                "location": match["location"], "elapsed": match["time"], "death_minute": death_minute,
              "death_match": death_match, "death_stadium": death_stadium, "death_cumulated": death_cumulated, "score": match["score"]}
-    message = list_tweets[event]["message"].format(**dict)
+
+    nonformmsg=random.choice(list_tweets[event])["message"]
+    message = nonformmsg.format(**dict)
+    print(message)
+
     if message != "":
         if list_tweets[event]["picture"] != '':
             print(message)
