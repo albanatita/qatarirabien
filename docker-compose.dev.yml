@@ -60,8 +60,8 @@ services:
     build: 
       context: ./TwitterBot
       dockerfile: Dockerfile.dev
-#    command: bash -c 'while !</dev/tcp/web/5000; do sleep 1; done; python twitterbot.py'
-    command: bash -c 'python twitterbot.py'
+    command: bash -c 'while !</dev/tcp/web/5000; do sleep 1; done; python simplebot.py'
+#    command: bash -c 'python simplebot.py'
     env_file:
       - ./TwitterBot/.env.en
     volumes:

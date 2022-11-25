@@ -26,3 +26,5 @@ python3 db_manage.py
 
 docker-compose -f docker-compose.dev.yml exec db bash
 psql messages -U postgres
+
+docker network create my-net

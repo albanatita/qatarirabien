@@ -6,6 +6,7 @@ import requests
 import time
 import sys
 import pickle
+import random
 from dotenv import load_dotenv
 
 language = 'fr'
@@ -30,15 +31,16 @@ BEARER_TOKEN = get_env_variable("TWITTER_BEARER_TOKEN")
 
 # Setup access to API
 
-auth = tweepy.OAuthHandler(
-            CONSUMER_KEY,
-            CONSUMER_SECRET
-            )
-auth.set_access_token(
-            ACCESS_TOKEN,
-            ACCESS_SECRET
-            )
-api = tweepy.API(auth)
+#auth = tweepy.OAuthHandler(
+#            CONSUMER_KEY,
+#            CONSUMER_SECRET
+#            )
+#auth.set_access_token(
+#            ACCESS_TOKEN,
+#            ACCESS_SECRET
+#            )
+#api = tweepy.API(auth)
+
 # media = api.media_upload("./data/img5.png")
 #print(media)
 # media_id = '1594982252651454466'
@@ -56,9 +58,10 @@ with open("./data/tweets.csv", "r") as filestream:
     list_tweets = dict()
     for line in filestream:
         currentline = line.split(";")
-        list_tweets[currentline[0]] = {
-            "message": currentline[1], "picture": currentline[2]}
-
+        if currentline[0] not in list_tweets:
+            list_tweets[currentline[0]]=[{"message": currentline[1], "picture": currentline[2]}]
+        else:
+            list_tweets[currentline[0]].append({"message": currentline[1], "picture": currentline[2]})
 translations=pickle.load( open( "./data/translation.p", "rb" ) )
 
 def with_requests(url, headers):
@@ -88,6 +91,7 @@ dict = {"team_1": translations[match['home_name']]['translation']['fr'], "team_2
              "hashtag": hashtag,
                "location": match["location"], "elapsed": match["time"], "death_minute": death_minute,
              "death_match": death_match, "death_stadium": death_stadium, "death_cumulated": death_cumulated, "score": match["score"]}
-message = list_tweets[event]["message"].format(**dict)
+nonformmsg=random.choice(list_tweets[event])["message"]
+message = nonformmsg.format(**dict)
 print(message)
-print(list_tweets[event]["picture"].strip())
+#print(list_tweets[event]["picture"].strip())

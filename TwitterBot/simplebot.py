@@ -18,34 +18,10 @@ def get_env_variable(name):
         message = "Expected environment variable '{}' not set.".format(name)
         raise Exception(message)
 
-
-#load_dotenv()
-# Variables that contains the credentials to access Twitter API
-ACCESS_TOKEN = get_env_variable("TWITTER_ACCESS_TOKEN")
-ACCESS_SECRET = get_env_variable("TWITTER_ACCESS_SECRET")
-CONSUMER_KEY = get_env_variable("TWITTER_CONSUMER_KEY")
-CONSUMER_SECRET = get_env_variable("TWITTER_CONSUMER_SECRET")
-BEARER_TOKEN = get_env_variable("TWITTER_BEARER_TOKEN")
 LANGUAGE = get_env_variable("LANGUAGE")
-API_VERSION = get_env_variable("API_VERSION")
 
-print("=====> starting twitter bot - Language : " + LANGUAGE)
+print("=====> starting simple bot - Language : " + LANGUAGE)
 
-if API_VERSION == "1":
-    auth = tweepy.OAuthHandler(
-            CONSUMER_KEY,
-            CONSUMER_SECRET
-            )
-    auth.set_access_token(
-            ACCESS_TOKEN,
-            ACCESS_SECRET
-            )
-    api = tweepy.API(auth)
-else:
-    client2=tweepy.Client(BEARER_TOKEN,consumer_key=CONSUMER_KEY,consumer_secret=CONSUMER_SECRET,
-                access_token=ACCESS_TOKEN, access_token_secret=ACCESS_SECRET,
-                return_type = requests.Response,
-                         wait_on_rate_limit=True)
 
 with open("./data/tweets_" + LANGUAGE + ".csv", "r") as filestream:
     list_tweets = dict()
@@ -99,25 +75,4 @@ for event in client:
     message = nonformmsg.format(**dict)
     print(message)
 
-    if message != "":
-        if randommsg["picture"] != '':
-            print(message)
-            if API_VERSION == "1":
-                try:
-                    media = api.media_upload("./data/"+randommsg["picture"].strip())
-                    api.update_status(status=message[:255], media_ids=[media.media_id])
-                except Exception as e:
-                    print(e)
-                    api.update_status(status=message[:255])
-            else:
-                client2.create_tweet(text=message[:255])
-        else:
-            print(message)
-            if API_VERSION == "1": 
-                try:
-                    api.update_status(status=message[:255])
-                except Exception as e:
-                    print(e)
-            else:
-                client2.create_tweet(text=message[:255])
-        time.sleep(30)
+    

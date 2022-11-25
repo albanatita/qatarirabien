@@ -1,5 +1,6 @@
-from .messenger import db
+from flask_sqlalchemy import SQLAlchemy
 
+db = SQLAlchemy()
 
 class Game(db.Model):
     __tablename__ = 'public.game_list'
@@ -25,6 +26,7 @@ class FloatingTweet(db.Model):
     language = db.Column(db.String(20))
     publish_date = db.Column(db.DateTime)
     repeat = db.Column(db.Integer)
+    
 
     def __init__(self, tweet_content, language, publish_date, repeat):
         self.tweet_content = tweet_content
@@ -41,13 +43,16 @@ class MatchesEvents(db.Model):
     score = db.Column('score', db.String(20))
     cumulatedTime = db.Column('cumulated_time', db.Integer)
     status = db.Column(db.String(100))
+    event_id = db.Column('event_id', db.Integer)
 
-    def __init__(self, id_match, last_update, score, cumulatedTime, status):
+    def __init__(self, id_match, last_update, score, cumulatedTime, status,event):
         self.id_match = id_match
         self.last_update = last_update
         self.score = score
         self.cumulatedTime = cumulatedTime
         self.status = status
+        self.event_id = event
+        
 
 # get last row a match with a given ID - None if match not yet in database
 
