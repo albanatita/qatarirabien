@@ -41,7 +41,6 @@ def with_requests(url, headers):
 
 # api = connect_to_twitter_OAuth()
 
-
 url = 'http://web:5000/stream'
 # headers = {'Accept': 'text/event-stream'}
 # response = with_requests(url, headers)
@@ -63,7 +62,7 @@ for event in client:
     else:
         team1_t = translations[match['home_name']]['translation'][LANGUAGE]
         team2_t = translations[match['away_name']]['translation'][LANGUAGE]
-
+    
     hashtag = "#"+translations[match['home_name']]['hashtag']+translations[match['away_name']]['hashtag']
     dict = {"team_1": team1_t, "team_2": team2_t,
              "hashtag": hashtag,

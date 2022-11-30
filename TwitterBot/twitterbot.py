@@ -93,31 +93,33 @@ for event in client:
              "hashtag": hashtag,
                "location": match["location"], "elapsed": match["time"], "death_minute": death_minute,
              "death_match": death_match, "death_stadium": death_stadium, "death_cumulated": death_cumulated, "score": match["score"]}
+    try:
+        randommsg = random.choice(list_tweets[event])
+        nonformmsg = randommsg["message"]
+        message = nonformmsg.format(**dict)
+        print(message)
 
-    randommsg = random.choice(list_tweets[event])
-    nonformmsg = randommsg["message"]
-    message = nonformmsg.format(**dict)
-    print(message)
-
-    if message != "":
-        if randommsg["picture"] != '':
-            print(message)
-            if API_VERSION == "1":
-                try:
-                    media = api.media_upload("./data/"+randommsg["picture"].strip())
-                    api.update_status(status=message[:255], media_ids=[media.media_id])
-                except Exception as e:
-                    print(e)
-                    api.update_status(status=message[:255])
+        if message != "":
+            if randommsg["picture"] != '':
+                print(message)
+                if API_VERSION == "1":
+                    try:
+                        media = api.media_upload("./data/"+randommsg["picture"].strip())
+                        api.update_status(status=message[:255], media_ids=[media.media_id])
+                    except Exception as e:
+                        print(e)
+                        api.update_status(status=message[:255])
+                else:
+                    client2.create_tweet(text=message[:255])
             else:
-                client2.create_tweet(text=message[:255])
-        else:
-            print(message)
-            if API_VERSION == "1": 
-                try:
-                    api.update_status(status=message[:255])
-                except Exception as e:
-                    print(e)
-            else:
-                client2.create_tweet(text=message[:255])
-        time.sleep(30)
+                print(message)
+                if API_VERSION == "1": 
+                    try:
+                        api.update_status(status=message[:255])
+                    except Exception as e:
+                        print(e)
+                else:
+                    client2.create_tweet(text=message[:255])
+            time.sleep(30)
+    except Exception as e:
+        print(e)

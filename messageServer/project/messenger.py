@@ -77,7 +77,7 @@ def extractData(events):
         lastRowMatch = models.lastRowMatch(id)
  
         if status == 'NOT STARTED' and lastRowMatch is None:
-            newmatch = models.MatchesEvents(id, last_changed, score, 0, status)
+            newmatch = models.MatchesEvents(id, last_changed, score, 0, status,0)
             matches_toupdate.append(newmatch)
 
         if lastRowMatch is not None:
@@ -94,15 +94,16 @@ def extractData(events):
                     .total_seconds() / 60)
                 if event != 'False':
                     event_url=event
-                    result=EventAPICall(event_url)
+                    result=EventAPICall(event_url)['data']
                     events=result['event']
-                    id_event=max(events, key=lambda x:x['sort'])
-                    if id_event['sort'] != lastRowMatch.event_id:
-                        if id_event['event'] == 'YELLOW CARD':
-                            list_messages.append({'match': match, 'event': 'yellowcard'})
-                            newmatch = models.MatchesEvents(
-                                id, last_changed, score, 0, status,id_event['sort'])
-                            matches_toupdate.append(newmatch)
+                    if events !=[]:
+                        id_event=max(events, key=lambda x:x['sort'])
+                        if id_event['sort'] != lastRowMatch.event_id:
+                            if id_event['event'] == 'YELLOW_CARD':
+                                list_messages.append({'match': match, 'event': 'yellowcard'})
+                                newmatch = models.MatchesEvents(
+                                    id, last_changed, score, 0, status,id_event['sort'])
+                                matches_toupdate.append(newmatch)
                             
 
                 # check if match has just started
@@ -110,19 +111,19 @@ def extractData(events):
                     newmatch = models.MatchesEvents(
                         id, last_changed, score, 0, status,0)
                     matches_toupdate.append(newmatch)
-                    scheduler.add_job(messageDuringMatch30, 'date', run_date=datetime.now()+datetime.timedelta(hours=0, minutes=30),args=[match,cumulated_time])
+                    scheduler.add_job(messageDuringMatch30, 'date', run_date=datetime.now()+timedelta(hours=0, minutes=30),args=[match,cumulated_time])
                     list_messages.append({'match': match, 'event': 'startgame'})
 
                 if (status == 'HALF TIME BREAK' and lastRowMatch.status != 'HALF TIME BREAK'):
                     newmatch = models.MatchesEvents(
-                        id, last_changed, score, 0, status, lastevent=lastRowMatch.event_id)
+                        id, last_changed, score, 0, status, lastRowMatch.event_id)
                     matches_toupdate.append(newmatch)
                     list_messages.append(
                         {'match': match, 'event': 'halftime'})
 
                 if (status != 'HALF TIME BREAK' and lastRowMatch.status == 'HALF TIME BREAK'):
                     newmatch = models.MatchesEvents(
-                        id, last_changed, score, 0, status, lastevent=lastRowMatch.event_id)
+                        id, last_changed, score, 0, status, lastRowMatch.event_id)
                     matches_toupdate.append(newmatch)
                     list_messages.append(
                         {'match': match, 'event': 'endhalftime'})
@@ -131,11 +132,15 @@ def extractData(events):
                 cumulated_time += elapsed
                 if newgoal and (score.replace(" ", "") != "0-0"):
                     newmatch = models.MatchesEvents(
-                        id, last_changed, score, 0, status, lastevent=lastRowMatch.event_id)
+                        id, last_changed, score, 0, status, lastRowMatch.event_id)
                     matches_toupdate.append(newmatch)
                     goal1_now = int(score.replace(" ", "").split('-')[0])
                     goal2_now = int(score.replace(" ", "").split('-')[1])
-                    goal1_before = int(lastRowMatch.score.replace(" ", "").split('-')[0])
+                    goal1_before = lastRowMatch.score.replace(" ", "").split('-')[0]
+                    if goal1_before =='?':
+                        goal1_before=0
+                    else:
+                        goal1_before=int(goal1_before)
                     if goal1_now == goal2_now:
                         event_str = "equalizer"
                     else:
@@ -183,7 +188,7 @@ def updateTasks():
         scheduler.add_job(messageBeforeMatch30, 'date', run_date=datebefore, args=[fixture],)
         datebefore = datelocal - timedelta(hours=0, minutes=10)
         scheduler.add_job(messageBeforeMatch10, 'date', run_date=datebefore, args=[fixture],)
-    #pickle.dump( translation, open( "./data/translation.p", "wb" ) )
+    pickle.dump( translation, open( "./data/translation.p", "wb" ) )
     #print(translation)
 
 @app.route('/')
@@ -211,6 +216,7 @@ def check_LiveScoreAPI():
 # TODO REMOVE limit
         for msg in result:
             print("messenger --> new message")
+            print(msg['event'])
             sse.publish(msg, type=msg['event'])
         return 'OK'
 

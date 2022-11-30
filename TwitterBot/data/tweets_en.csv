@@ -1,5 +1,5 @@
 beforematch30;In 25 minutes, the match {team_1} - {team_2} {hashtag} will start. 6500 foreign workers have died since Qatar was chosen to organize #worldcup2022. This represents an average of {death_match} dead per game. #Qatar2022 🇶🇦⚽️⚰️;img1.png
-beforematch30;{hashtag} In 25 minutes, the encounter between {team_1} et {team2}. 6500 have died since Qatar was chosen to organize #worldcup2022. CThis represents an average of {death_match} dead per game. #Qatar2022 🇶🇦⚽️⚰️;img1.png
+beforematch30;{hashtag} In 25 minutes, the encounter between {team_1} et {team_2}. 6500 have died since Qatar was chosen to organize #worldcup2022. CThis represents an average of {death_match} dead per game. #Qatar2022 🇶🇦⚽️⚰️;img1.png
 startgame;And this game {hashtag} FROM #Qatar2022 kicks off. The number of dead workers since the Qatar was chosen, relative to the present day is of {death_cumulated}  🇶🇦⚽️⚰️#QatarRedCard;img2.png
 beforematch10;This game {team_1} vs {team_2} takes place in {location}, and on corpses : for each stadium, the number of immigrant workers who died to prepare the World Cup is {death_stadium}, dead due to inhuman work conditions #QatarRedCard;img1.png
 halftime;Half-time! The score between {team_1} and {team_2} is {score}; It is a true slaughter embodying the {death_match} die workers who made this match possible. #WorldCup2022 #QatarRedCard;img3.png
@@ -8,3 +8,4 @@ goal1;Goal scored by {team_1} with a violent kick. Relative to elapsed time, {de
 goal2;Goal scored by {team_2} with a violent kick. Relative to elapsed time, {death_minute}  immigrant workers died in inhuman work conditions to prepare #WorldCup2022. RIP.;img5.png
 equalizer;Equalizer scored with a violent kick in the game between {team_1} and {team_2}. Relative to the elapsed time, {death_minute} immigrant workers died in inhuman work conditions to prepare #WorldCup2022. RIP.;img5.png
 endhalftime; {hashtag} The two teams {team_1} and {team_2} are back on the field;
+yellowcard; this is a new yellow card!;
